@@ -42,8 +42,8 @@ const Weather = () => {
   const getLocation = useGeolocation();
   // Default to houston
   const latLong = {
-    latitude: getLocation.latitude || 29.7604,
-    longitude: getLocation.longitude || -95.3698,
+    latitude: getLocation.latitude || 30.5928,
+    longitude: getLocation.longitude || 114.3055,
   };
   const dispatch = useDispatch();
   const { temperatureinFahrenheit, description, locationName } = useSelector(getWeather);
