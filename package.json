@@ -3,6 +3,7 @@
   "version": "2.0.0",
   "private": true,
   "dependencies": {
+    "@apollo/react-hooks": "^4.0.0",
     "@material-ui/core": "^4.6.1",
     "@material-ui/icons": "^4.5.1",
     "@material-ui/lab": "^4.0.0-alpha.57",
@@ -14,6 +15,7 @@
     "apollo-link": "^1.2.14",
     "apollo-link-http": "^1.5.17",
     "apollo-link-ws": "^1.0.20",
+    "aws-amplify-react": "^4.2.18",
     "graphql": "^14.7.0",
     "graphql-tag": "^2.11.0",
     "isomorphic-fetch": "^2.2.1",

@@ -3,9 +3,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { Provider, createClient, useQuery } from "urql";
 import { makeStyles } from "@material-ui/core/styles";
 import LinearProgress from "@material-ui/core/LinearProgress";
-import Card from '@material-ui/core/Card';
-import CardContent from '@material-ui/core/CardContent';
-import Typography from '@material-ui/core/Typography';
+
 import {
   LineChart,
   Line,
@@ -30,6 +28,8 @@ query($input: MeasurementQuery) {
 }
 `;
 
+
+
 const useStyles = makeStyles({
   chartBox: {
     padding: "5px 0"
@@ -51,7 +51,6 @@ const useStyles = makeStyles({
 });
 const getLabel = metricName => {
   switch (metricName) {
-
     case "tubingPressure":
     case "casingPressure":
       return "PSI";
@@ -91,6 +90,7 @@ const Chart = () => {
     }
   });
 
+
   const { fetching, data, error } = measurementRes;
   useEffect(() => {
     if (error) {
@@ -122,14 +122,7 @@ const Chart = () => {
   const label = getLabel(selectedMetric);
   return (
     <div className={classes.root}>
-      <environment />
-      <Card >
-        <CardContent>
-          <Typography variant="body2" component="p">
-            {selectedMetric}
-          </Typography>
-        </CardContent>
-      </Card>
+
       <ResponsiveContainer width="100%" minWidth={400} aspect={25.0 / 9.0}>
         <LineChart
           height={300}
