@@ -2,9 +2,10 @@ import React, { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { Provider, createClient, useQuery } from "urql";
 import { makeStyles } from "@material-ui/core/styles";
-import Box from "@material-ui/core/Box";
 import LinearProgress from "@material-ui/core/LinearProgress";
-
+import Card from '@material-ui/core/Card';
+import CardContent from '@material-ui/core/CardContent';
+import Typography from '@material-ui/core/Typography';
 import {
   LineChart,
   Line,
@@ -15,7 +16,6 @@ import {
   ResponsiveContainer,
   Label
 } from "recharts";
-
 const client = createClient({
   url: "https://react.eogresources.com/graphql"
 });
@@ -80,8 +80,6 @@ const Chart = () => {
   const heartBeat = useSelector(state => state.heartBeat);
   const selectedMetric = useSelector(state => state.selectedMetrics.selectedMetric);
   const measurements = useSelector(state => state.measurements);
-
-
   const [measurementRes] = useQuery({
     query: measurementQuery,
     variables: {
@@ -113,7 +111,6 @@ const Chart = () => {
   });
 
   if (fetching) return <LinearProgress />;
-
   const metricColors = {
     tubingPressure: 'green',
     casingPressure: 'blue',
@@ -122,13 +119,18 @@ const Chart = () => {
     waterTemp: 'teal',
     injValveOpen: 'black',
   }
-
   const label = getLabel(selectedMetric);
-
   return (
-
-    <Box className={classes.chartBox}>
-      <ResponsiveContainer width="100%" minWidth={400} aspect={16.0 / 9.0}>
+    <div className={classes.root}>
+      <environment />
+      <Card >
+        <CardContent>
+          <Typography variant="body2" component="p">
+            {selectedMetric}
+          </Typography>
+        </CardContent>
+      </Card>
+      <ResponsiveContainer width="100%" minWidth={400} aspect={25.0 / 9.0}>
         <LineChart
           height={300}
           data={measurements}
@@ -154,8 +156,8 @@ const Chart = () => {
           />
         </LineChart>
       </ResponsiveContainer>
+    </div>
 
-    </Box>
 
   );
 };

@@ -1,7 +1,8 @@
 import { SELECT_METRIC } from "../actions";
 
 const initialState = {
-    selectedMetric: ''
+    selectedMetric: '',
+    lastestMetricValue: ''
 };
 
 export default (state = initialState, action) => {
