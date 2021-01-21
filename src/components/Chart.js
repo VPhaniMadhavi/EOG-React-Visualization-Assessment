@@ -108,20 +108,20 @@ const Chart = () => {
   const dispatch = useDispatch();
   const heartBeat = useSelector(state => state.heartBeat);
   const selectedMetric = useSelector(state => state.selectedMetrics.selectedMetric);
-  console.log("SELECTED METRICS ", selectedMetric);
   const [state, setState] = React.useState({
     tooltip: [],
   });
 
   let variables = [];
   if (selectedMetric != null) {
+
     for (let i = 0; i < selectedMetric.length; i++) {
       if (selectedMetric[i] !== "") {
         variables.push({ "metricName": selectedMetric[i], "after": heartBeat.after - 1800000 })
       }
     }
   } else {
-    console.log("NO METRICS")
+
   }
   let [result] = useQuery({
     query: query_multiple_measurements,
@@ -177,58 +177,60 @@ const Chart = () => {
 
   return (
     <div className={classes.root}>
-      <ResponsiveContainer width="95%" height={400}>
-        <LineChart
-          width={500}
-          height={300}
-          data={data_list}
-          onMouseMove={displayTooltip("tooltip")}
-          onMouseLeave={hideTooltip("tooltip")}
-          margin={{
-            top: 5,
-            right: 30,
-            left: 20,
-            bottom: 5
-          }}
-        >
-          <CartesianGrid strokeDasharray="3 3" />
-          <XAxis
-            dataKey="at"
-            allowDataOverflow={true}
-            tickFormatter={formatXAxis}
+      {data_list !== undefined ?
+        <ResponsiveContainer width="95%" height={400}>
+          <LineChart
+            width={500}
+            height={300}
+            data={data_list}
+            onMouseMove={displayTooltip("tooltip")}
+            onMouseLeave={hideTooltip("tooltip")}
+            margin={{
+              top: 5,
+              right: 30,
+              left: 20,
+              bottom: 5
+            }}
+          >
+            <CartesianGrid strokeDasharray="3 3" />
+            <XAxis
+              dataKey="at"
+              allowDataOverflow={true}
+              tickFormatter={formatXAxis}
 
-          />
-          <YAxis
-            domain={["auto", "auto"]}
-            scale="linear"
-            padding={{ top: 10, bottom: 10 }}
-            tickCount={10}
+            />
+            <YAxis
+              domain={["auto", "auto"]}
+              scale="linear"
+              padding={{ top: 10, bottom: 50 }}
+              tickCount={10}
 
-          />
-          <Tooltip />
-          <Legend />
+            />
+            <Tooltip />
 
-          {selectedMetric
-            ? selectedMetric.map(a => {
-              return (
-                <Line
-                  type="monotone"
-                  key={`${a}`}
-                  dataKey={`${a}`}
-                  strokeOpacity="3"
-                  stroke={metricColors[a]}
-                  activeDot={{ r: 8 }}
-                  isAnimationActive={false}
-                  dot={false}
-                />
-              );
-            })
-            : null}
-        </LineChart>
+            <Legend />
+
+            {selectedMetric
+              ? selectedMetric.map(a => {
+                return (
+                  <Line
+                    type="monotone"
+                    key={`${a}`}
+                    dataKey={`${a}`}
+                    strokeOpacity="3"
+                    stroke={metricColors[a]}
+                    activeDot={{ r: 8 }}
+                    isAnimationActive={false}
+                    dot={false}
+                  />
+                );
+              })
+              : null}
+          </LineChart>
 
 
-      </ResponsiveContainer>
-
+        </ResponsiveContainer>
+        : null}
     </div>);
 }
 

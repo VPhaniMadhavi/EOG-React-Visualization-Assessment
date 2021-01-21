@@ -2,12 +2,12 @@ import React, { useEffect } from "react";
 import { useDispatch } from "react-redux";
 import { Provider, createClient, useQuery } from "urql";
 import { makeStyles } from "@material-ui/core/styles";
-import Paper from "@material-ui/core/Paper";
+
 import MetricSelector from './MetricSelector';
 
 
 const useStyles = makeStyles({
-    paper: {
+    divDisplay: {
         margin: "3%",
         padding: "20px"
     }
@@ -57,10 +57,8 @@ const Container = () => {
 
 
     return (
-        <Paper className={classes.paper}>
+        <div >
             <MetricSelector />
-
-
-        </Paper>
+        </div>
     );
 }

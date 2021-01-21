@@ -1,6 +1,6 @@
 
 
-import React from 'react';
+import React, { useEffect } from 'react';
 import { makeStyles } from '@material-ui/core/styles';
 import { useDispatch, useSelector } from "react-redux";
 import Chart from './Chart';
@@ -55,7 +55,8 @@ const allMetrics = ["oilTemp", "tubingPressure", "injValveOpen", "flareTemp", "w
 const useStyles = makeStyles((theme) => ({
     formControl: {
         margin: theme.spacing(1),
-        minWidth: 200,
+        minWidth: 120,
+        maxWidth: 300
 
     },
     selectEmpty: {
@@ -68,10 +69,28 @@ const useStyles = makeStyles((theme) => ({
         padding: theme.spacing(2),
         textAlign: 'center',
         color: theme.palette.text.secondary
-    }
+    },
+    whiteBackground: {
+        backgroundColor: "#FFF"
+    },
+    formControl: {
+        margin: theme.spacing(1),
+        minWidth: 200,
+        maxWidth: 600
+    },
+    chips: {
+        display: "flex",
+        flexWrap: "wrap"
+    },
+    chip: {
+        margin: 5,
+        backgroundColor: "#FFF"
+    },
+
 }
 ));
 const initialSelected = ["oilTemp"];
+
 
 export default () => {
     return (
@@ -87,7 +106,7 @@ function MetricSelector() {
     var selectedMetric = useSelector(state => state.selectedMetrics.selectedMetric);
     const [metriic, setMetric] = React.useState(initialSelected);
     const [res] = useSubscription({ query: measurementSubscriptionQuery }, handleSubscription);
-    console.log("MMM", metriic);
+
 
     if (!res.data) {
         return <p></p>;
@@ -135,9 +154,12 @@ function MetricSelector() {
     return (
         < div >
             <div style={{ display: "inline-block" }}>
-
+                <InputLabel id="demo-mutiple-chip-checkbox-label">
+                    <h4>Select--</h4>
+                </InputLabel>
                 <FormControl className={classes.formControl}>
                     <Select
+                        labelId="demo-mutiple-chip-checkbox-label"
                         multiple
                         defaultValue="select"
                         value={metriic}
@@ -172,34 +194,34 @@ function MetricSelector() {
                     </Select>
                 </FormControl>
             </div>
-            <div >
+            <div className={classes.chips}>
 
                 <Grid container justify="space-around" spacing={4}>
                     <Grid item xs={6}>
                         <Grid container direction="column" spacing={2}>
                             <Grid item>
-                                <Paper className={classes.paper}>
-                                    <Typography component={'span'}>
-                                        {metriic.map((value) => (
-                                            <Chip
-                                                key={value}
-                                                defaultValue=""
-                                                label={value !== "" ? value + "    " + metricNewMeasurements[value] : "MetricValue :0"}
-                                                className={classes.chip}
-                                            />
-                                        ))}
 
+                                <Typography component={'span'}>
+                                    {metriic.map((value) => (
 
+                                        <Chip
 
-                                    </Typography>
-                                </Paper>
+                                            key={value}
+                                            defaultValue=""
+                                            label={value !== "" ? value + "    " + metricNewMeasurements[value] : "Data"}
+                                            className={classes.chip}
+                                        />
+                                    ))}
+
+                                </Typography>
+
                             </Grid>
                         </Grid>
                     </Grid>
                 </Grid>
             </div>
             <div style={{ margin: '30px' }}>
-                {selectedMetric !== '' ? <Chart /> : ""}
+                {selectedMetric !== "" ? <Chart /> : ""}
             </div>
         </ div>
 
