@@ -50,7 +50,7 @@ const handleSubscription = (measurements = [], response) => {
 
 const subscriptionClient = new SubscriptionClient("ws://react.eogresources.com/graphql", {});
 
-const allMetrics = ["oilTemp", "tubingPressure", "injValveOpen", "flareTemp", "waterTemp"];
+const allMetrics = ["oilTemp", "tubingPressure", "injValveOpen", "flareTemp", "waterTemp", "casingPressure"];
 
 const useStyles = makeStyles((theme) => ({
     formControl: {
@@ -80,11 +80,12 @@ const useStyles = makeStyles((theme) => ({
     },
     chips: {
         display: "flex",
-        flexWrap: "wrap"
+        flexWrap: "wrap",
     },
     chip: {
         margin: 5,
-        backgroundColor: "#FFF"
+        backgroundColor: "#FFF",
+
     },
 
 }
@@ -135,13 +136,11 @@ function MetricSelector() {
     }
     const handleChange = (event) => {
         setMetric(event.target.value);
+        dispatch({
+            type: "SELECT_METRIC",
+            payload: event.target.value
+        })
 
-        if (event.target.value.length !== 0) {
-            dispatch({
-                type: "SELECT_METRIC",
-                payload: event.target.value
-            })
-        }
     };
     /*const handleDelete = (event, value) => {
          console.log("clicked delete", value);
@@ -179,7 +178,7 @@ function MetricSelector() {
                                         }
                                         className={classes.chip}
 
-                                        onClick={() => console.log("clicked chip")}
+                                        onClick={() => console.log(" ")}
                                     />
                                 ))}
                             </div>
@@ -221,7 +220,7 @@ function MetricSelector() {
                 </Grid>
             </div>
             <div style={{ margin: '30px' }}>
-                {selectedMetric !== "" ? <Chart /> : ""}
+                {selectedMetric.length !== 0 ? <Chart /> : ""}
             </div>
         </ div>
 

@@ -114,7 +114,6 @@ const Chart = () => {
 
   let variables = [];
   if (selectedMetric != null) {
-
     for (let i = 0; i < selectedMetric.length; i++) {
       if (selectedMetric[i] !== "") {
         variables.push({ "metricName": selectedMetric[i], "after": heartBeat.after - 1800000 })
