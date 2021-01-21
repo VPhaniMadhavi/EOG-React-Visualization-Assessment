@@ -2,22 +2,22 @@ import React, { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { Provider, createClient, useQuery } from "urql";
 import { makeStyles } from "@material-ui/core/styles";
-import LinearProgress from "@material-ui/core/LinearProgress";
-
 import {
   LineChart,
   Line,
   XAxis,
   YAxis,
   CartesianGrid,
-  Tooltip,
   ResponsiveContainer,
-  Label
+
+  Legend
 } from "recharts";
+
+import { Tooltip } from "@material-ui/core";
 const client = createClient({
   url: "https://react.eogresources.com/graphql"
 });
-const measurementQuery = `
+/*const measurementQuery = `
 query($input: MeasurementQuery) {
   getMeasurements(input: $input) {
     metric,
@@ -26,8 +26,21 @@ query($input: MeasurementQuery) {
     unit
   }                                                                                       
 }
-`;
+`;*/
 
+const query_multiple_measurements = `
+query($input: [MeasurementQuery] )
+{
+  getMultipleMeasurements(input: $input) {
+    metric
+    measurements {
+     at
+     value
+     metric
+     unit
+    }
+  }
+}`;
 
 
 const useStyles = makeStyles({
@@ -49,21 +62,14 @@ const useStyles = makeStyles({
     marginBottom: 12,
   },
 });
-const getLabel = metricName => {
-  switch (metricName) {
-    case "tubingPressure":
-    case "casingPressure":
-      return "PSI";
-    case "oilTemp":
-    case "flareTemp":
-    case "waterTemp":
-      return "F";
-    case "injValveOpen":
-      return "%";
-    default:
-      return;
-  }
-};
+
+
+var moment = require("moment");
+function formatXAxis(tickItem) {
+  tickItem = moment(parseInt(tickItem)).format("LT");
+  return tickItem;
+}
+
 
 export default () => {
   return (
@@ -73,84 +79,156 @@ export default () => {
   );
 };
 
+const measurementDataToChartFormat = (selectedMetric, getMultipleMeasurements) => {
+  let data_chart_format = [];
+  if (getMultipleMeasurements.getMultipleMeasurements !== undefined) {
+    var data = getMultipleMeasurements.getMultipleMeasurements;
+    var mlength = 0;
+    Object.values(data).map((ob) => mlength = ob["measurements"].length);
+
+    for (let index = 0; index < mlength; index++) {
+      let obj = {};
+      for (let j = 0; j < data.length; j++) {
+        obj[data[j].measurements[index].metric] =
+          data[j].measurements[index].value;
+        obj["at"] = data[j].measurements[index].at;
+      }
+      data_chart_format.push(obj);
+    }
+
+    return data_chart_format;
+  }
+}
+
+
+
+
 const Chart = () => {
   const classes = useStyles();
   const dispatch = useDispatch();
   const heartBeat = useSelector(state => state.heartBeat);
   const selectedMetric = useSelector(state => state.selectedMetrics.selectedMetric);
-  const measurements = useSelector(state => state.measurements);
-  const [measurementRes] = useQuery({
-    query: measurementQuery,
-    variables: {
-      input: {
-        metricName: selectedMetric,
-        before: heartBeat,
-        after: heartBeat.after - 1800000
-      }
-    }
+  console.log("SELECTED METRICS ", selectedMetric);
+  const [state, setState] = React.useState({
+    tooltip: [],
   });
 
-
-  const { fetching, data, error } = measurementRes;
+  let variables = [];
+  if (selectedMetric != null) {
+    for (let i = 0; i < selectedMetric.length; i++) {
+      if (selectedMetric[i] !== "") {
+        variables.push({ "metricName": selectedMetric[i], "after": heartBeat.after - 1800000 })
+      }
+    }
+  } else {
+    console.log("NO METRICS")
+  }
+  let [result] = useQuery({
+    query: query_multiple_measurements,
+    variables: {
+      input:
+        variables
+    }
+  }
+  );
+  const { data, error, fetching } = result;
   useEffect(() => {
-    if (error) {
-      console.log(error.message);
+    if (!data) {
+      return;
+    }
+    if (fetching) {
       return;
     }
     if (!data) {
       return;
     } else {
-      console.log("mesasurement", data);
-      console.log("heartbeat", heartBeat);
-      const { getMeasurements } = data;
-      dispatch({
-        type: "GET_MEASUREMENTS",
-        payload: getMeasurements
-      });
-    }
-  });
+      let getMultipleMeasurements = [];
+      getMultipleMeasurements = data;
+      //console.log("Mult", getMultipleMeasurements);
 
-  if (fetching) return <LinearProgress />;
+      dispatch({
+        type: "GET_MULTI_MEASUREMENTS",
+        payload: getMultipleMeasurements
+      });
+
+    }
+
+  }, [dispatch, data, error, fetching]);
+
+  const multi_measurements = useSelector(state => state.getMultipleMeasurements);
+  var data_list = [];
+  data_list = measurementDataToChartFormat(data_list, multi_measurements);
+
   const metricColors = {
     tubingPressure: 'green',
     casingPressure: 'blue',
     oilTemp: 'purple',
     flareTemp: 'red',
     waterTemp: 'teal',
-    injValveOpen: 'black',
+    injValveOpen: 'orange',
   }
-  const label = getLabel(selectedMetric);
+
+  const displayTooltip = name => e => {
+    setState({ ...state, [name]: e });
+  };
+  const hideTooltip = name => e => {
+    setState({ ...state, [name]: [] })
+  }
+
   return (
     <div className={classes.root}>
-
-      <ResponsiveContainer width="100%" minWidth={400} aspect={25.0 / 9.0}>
+      <ResponsiveContainer width="95%" height={400}>
         <LineChart
+          width={500}
           height={300}
-          data={measurements}
+          data={data_list}
+          onMouseMove={displayTooltip("tooltip")}
+          onMouseLeave={hideTooltip("tooltip")}
           margin={{
             top: 5,
-            right: 5,
-            left: 5,
+            right: 30,
+            left: 20,
             bottom: 5
           }}
         >
           <CartesianGrid strokeDasharray="3 3" />
-          <XAxis domain={["auto", "auto"]} />
-          <YAxis domain={["auto", "dataMax + 1"]}>
-            <Label value={label} position='insideLeft' offset='-2' />
-          </YAxis>
-          <Tooltip />
-          <Line
-            type="monotone"
-            dataKey="value"
-            stroke={metricColors[selectedMetric]}
-            activeDot={{ r: 6 }}
-            dot={false}
+          <XAxis
+            dataKey="at"
+            allowDataOverflow={true}
+            tickFormatter={formatXAxis}
+
           />
+          <YAxis
+            domain={["auto", "auto"]}
+            scale="linear"
+            padding={{ top: 10, bottom: 10 }}
+            tickCount={10}
+
+          />
+          <Tooltip />
+          <Legend />
+
+          {selectedMetric
+            ? selectedMetric.map(a => {
+              return (
+                <Line
+                  type="monotone"
+                  key={`${a}`}
+                  dataKey={`${a}`}
+                  strokeOpacity="3"
+                  stroke={metricColors[a]}
+                  activeDot={{ r: 8 }}
+                  isAnimationActive={false}
+                  dot={false}
+                />
+              );
+            })
+            : null}
         </LineChart>
+
+
       </ResponsiveContainer>
-    </div>
 
+    </div>);
+}
 
-  );
-};

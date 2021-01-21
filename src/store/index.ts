@@ -17,7 +17,8 @@ export default () => {
     weather: weatherReducer,
     selectedMetrics: metricReducer,
     heartBeat: heartBeatReducer,
-    measurements: measurementsReducer
+    measurements: measurementsReducer,
+    getMultipleMeasurements: measurementsReducer
   });
 
   const composeEnhancers = composeWithDevTools({});

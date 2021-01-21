@@ -1,13 +1,8 @@
-import { GET_MEASUREMENTS } from "../actions";
+import { GET_MULTI_MEASUREMENTS, GET_MEASUREMENTS } from "../actions";
 
 const initialState = {
-    tubingPressure: [],
-    casingPressure: [],
-    oilTemp: [],
-    flareTemp: [],
-    waterTemp: [],
-    injValveOpen: [],
-    lastestMetricValue: ''
+
+    getMultipleMeasurements: []
 };
 
 export default (state = initialState, action) => {
@@ -15,6 +10,9 @@ export default (state = initialState, action) => {
         case GET_MEASUREMENTS:
             let measurements = action.payload
             return measurements;
+        case GET_MULTI_MEASUREMENTS:
+            let getMultipleMeasurements = action.payload
+            return getMultipleMeasurements;
         default:
             return state;
     }

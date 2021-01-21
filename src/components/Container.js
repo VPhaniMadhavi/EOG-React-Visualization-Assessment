@@ -37,6 +37,7 @@ const Container = () => {
     const [heartBeatRes] = useQuery({
         query: heartBeatQuery
     });
+
     const { data, error } = heartBeatRes;
     useEffect(
         () => {
@@ -52,9 +53,13 @@ const Container = () => {
             })
         }
     );
+
+
+
     return (
         <Paper className={classes.paper}>
             <MetricSelector />
+
 
         </Paper>
     );
